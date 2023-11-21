@@ -63,11 +63,11 @@ def create_gist(data, github_token):
         return response.json()
 
 
-def scraper(q: str):
+def scraper(q: str, gl: str):
     params = {
         "q": q,    # query example
         "hl": "en",                         # language
-        # "gl": "uk",                         # country of the search, UK -> United Kingdom
+        "gl": gl,                         # country of the search, UK -> United Kingdom
         "start": 0,                         # number page by default up to 0
         # parameter defines the maximum number of results to return.
         "num": 100

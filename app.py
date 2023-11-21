@@ -24,7 +24,8 @@ def url_form():
     corrected_url = ""
     if (form.is_submitted()):
         url = request.form["url"]
-        result = get_fuzzy_results(data=scraper(q=url), url=url)
+        gl = request.form["location"]
+        result = get_fuzzy_results(data=scraper(q=url, gl=gl), url=url)
         corrected_url = result[0]["url"]
     return render_template('index.html', form=form, result=result, corrected_url=corrected_url)
 
