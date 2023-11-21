@@ -2,5 +2,6 @@
 /Lib
 /Scripts
 /__pycache__
-
+*.cfg
+results.json
 .env
