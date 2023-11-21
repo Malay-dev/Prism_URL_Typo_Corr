@@ -3,6 +3,10 @@ from flask_cors import CORS
 from forms import UrlForm
 from scrape_urls import scraper
 from typo_correction import get_fuzzy_results
+
+from dotenv import load_dotenv
+load_dotenv()
+
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'test'
 CORS(app)

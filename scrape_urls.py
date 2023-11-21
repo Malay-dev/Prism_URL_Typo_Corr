@@ -1,7 +1,66 @@
 from bs4 import BeautifulSoup
 import requests
 import json
-import lxml
+import os
+
+
+GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
+
+
+def create_gist(data, github_token):
+    headers = {
+        "Accept": "application/vnd.github+json",
+        "Authorization": f"Bearer {github_token}",
+        "X-GitHub-Api-Version": "2022-11-28"
+    }
+
+    # Get a list of gists
+    response = requests.get("https://api.github.com/gists", headers=headers)
+    gists = response.json()
+
+    # Check if a Gist with the file name already exists
+    existing_gist_id = None
+    for gist in gists:
+        if "scraped_data.json" in gist["files"]:
+            existing_gist_id = gist["id"]
+            break
+
+    if existing_gist_id:
+        # Update the existing Gist with new data
+        gist_payload = {
+            "files": {
+                "scraped_data.json": {
+                    "content": json.dumps(data, indent=2, ensure_ascii=False)
+                }
+            }
+        }
+        response = requests.patch(
+            f"https://api.github.com/gists/{existing_gist_id}",
+            headers=headers,
+            json=gist_payload
+        )
+    else:
+        # Create a new Gist
+        gist_payload = {
+            "description": "Scraped data",
+            "public": True,
+            "files": {
+                "scraped_data.json": {
+                    "content": json.dumps(data, indent=2, ensure_ascii=False)
+                }
+            }
+        }
+        response = requests.post(
+            "https://api.github.com/gists",
+            headers=headers,
+            json=gist_payload
+        )
+
+    if response.status_code == 200 or response.status_code == 201:
+        gist_url = response.json()["html_url"]
+        return f"Gist created/updated: {gist_url}"
+    else:
+        return response.json()
 
 
 def scraper(q: str):
@@ -57,4 +116,6 @@ def scraper(q: str):
     # Write the combined dataset back to the file
     with open("results.json", "w", encoding="utf-8") as file_obj:
         json.dump(existing_data, file_obj, indent=2, ensure_ascii=False)
+
+    create_gist(data=existing_data, github_token=GITHUB_TOKEN)
     return data
