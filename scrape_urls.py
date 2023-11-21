@@ -98,7 +98,8 @@ def scraper(q: str, gl: str):
             data.append({
                 "title": title,
                 "snippet": snippet,
-                "links": links
+                "links": links,
+                "location": gl
             })
 
         if soup.select_one(".d6cvqb a[id=pnnext]"):
